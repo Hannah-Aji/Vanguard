@@ -733,16 +733,6 @@ async function startDriverLoop(){
         upsertBus(busId, rec.lat, rec.lng);
       }).subscribe();
 
-  // Optional: enable GPS ping by uncommenting below
-  // if ('geolocation' in navigator) {
-  //   navigator.geolocation.watchPosition(async pos=>{
-  //     const { latitude, longitude, heading, speed } = pos.coords;
-  //     await supabase.from('bus_locations_latest').upsert({
-  //       bus_id: busId, lat: latitude, lng: longitude, heading: heading || 0, speed: speed || 0, updated_at: new Date().toISOString()
-  //     }, { onConflict: 'bus_id' });
-  //     await supabase.from('bus_locations_history').insert({ bus_id: busId, lat: latitude, lng: longitude });
-  //   }, console.error, { enableHighAccuracy:true, maximumAge:5000, timeout:10000 });
-  // }
 }
 
 async function startAdminLoop(){
@@ -776,7 +766,8 @@ async function startAdminLoop(){
         const rec = payload.new || payload.old;
         if (!rec) return;
         upsertBus(rec.bus_id, rec.lat, rec.lng);
-      }).subscribe();
+      }
+    ).subscribe();
 }
 
 // ==========================
