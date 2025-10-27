@@ -1,0 +1,361 @@
+<!doctype html> <html lang="en"> <head> <meta charset="utf-8" /> <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <title>SchoolBus — Transport App</title>
+    <link rel="stylesheet" href="styles.css" />
+     <!-- Supabase JS --> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+     </head> <body> <div id="toast" class="toast" aria-live="polite"></div> <header class="appbar"> <div class="appbar__inner"> <div class="brand"> <span class="brand__dot" aria-hidden="true"></span> <span class="brand__text">School<span class="accent">Bus</span></span> </div>
+       <nav class="topnav" aria-label="Primary">
+        <button id="liveRouteBtn" class="btn btn--ghost">liveRoute</button>
+        <button id="accountBtn" class="btn btn--ghost">Account</button>
+        <button id="reFormBtn" class="btn btn--ghost">reForm</button>
+        <button id="logoutBtn" class="btn btn--ghost" hidden>Log out</button>
+      </nav>
+
+     </div> 
+    </header> <main id="app" class="container">
+    <!-- LOGIN -->
+    <section id="view-login" class="card" role="region" aria-labelledby="auth-title">
+      <!-- Pill tabs -->
+      <div class="auth-tabs" role="tablist" aria-label="Authentication tabs">
+        <button
+          id="tabSignIn"
+          class="auth-tab is-active"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="loginForm"
+          tabindex="0"
+        >
+          Sign in
+        </button>
+
+        <button
+          id="tabRegister"
+          class="auth-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="registerForm"
+          tabindex="-1"
+        >
+          Register
+        </button>
+
+        <!-- sliding pill -->
+        <span class="auth-tab__indicator" aria-hidden="true"></span>
+      </div>
+
+      <h1 id="auth-title" class="h2" style="margin: 1.2rem 0 1.6rem;">Good morning</h1>
+
+      <!-- Sign in form (unchanged logic) -->
+      <form
+        id="loginForm"
+        class="grid gap auth-panel is-active"
+        data-panel="signin"
+        role="tabpanel"
+        aria-labelledby="tabSignIn"
+      >
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="you@school.com" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" required />
+        </div>
+        <button class="btn" type="submit">Continue</button>
+      </form>
+
+      <!-- Register (parent-only) -->
+      <form
+        id="registerForm"
+        class="grid gap auth-panel"
+        data-panel="register"
+        role="tabpanel"
+        aria-labelledby="tabRegister"
+        hidden
+      >
+        <div class="field">
+          <label for="regEmail">Email</label>
+          <input id="regEmail" type="email" required />
+        </div>
+
+        <div class="field">
+          <label for="regPassword">Password</label>
+          <input id="regPassword" type="password" minlength="6" required />
+        </div>
+
+        <div class="grid gap-sm" style="grid-template-columns:1fr 1fr;">
+          <div class="field">
+            <label for="regFirst">First name</label>
+            <input id="regFirst" type="text" required />
+          </div>
+
+          <div class="field">
+            <label for="regLast">Last name</label>
+            <input id="regLast" type="text" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="regPhone">Phone</label>
+          <input id="regPhone" type="tel" placeholder="+2348012345678" />
+        </div>
+
+        <div class="field">
+          <label for="regAddress">Home address</label>
+          <input id="regAddress" type="text" />
+        </div>
+
+        <div class="field">
+          <label for="regNIN">NIN (11 digits)</label>
+          <input id="regNIN" type="text" inputmode="numeric" pattern="[0-9]{11}" maxlength="11" placeholder="12345678901" />
+        </div>
+
+        <button id="registerBtn" class="btn" type="submit">Create parent account</button>
+      </form>
+    </section>
+
+
+
+    <!-- RIDER DASH -->
+    <section id="view-liveRoute" class="view" hidden>
+      <!-- Background map -->
+      <div id="routeMap" class="map"></div>
+
+      <!-- Floating “Next stop” card -->
+      <div class="next-stop">
+        <div class="next-stop__left">
+          <div class="next-stop__title">
+            Next stop <span id="nextStopName">–</span>
+          </div>
+          <div class="next-stop__eta" id="nextStopETA">ETA —</div>
+        </div>
+        <button id="stopMenuBtn" aria-label="Open stops menu" class="icon-btn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+        </button>
+      </div>
+
+      <!-- Expanded stops dropdown -->
+      <div id="stopsPanel" class="stops-panel" hidden>
+        <div class="stops-panel__header">Stops (descending)</div>
+        <ol id="stopsList" class="stops-list"></ol>
+      </div>
+
+      <!-- Floating QR -->
+      <button id="qrBtn" class="qr-btn" aria-label="Show QR pass">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm6-2h2v4h4v2h-6V3zm-8 10h8v8H3v-8zm2 2v4h4v-4H5zm10-2h2v2h2v2h2v2h-6v-6zm0 6h2v2h-2v-2z"/>
+        </svg>
+      </button>
+
+      <!-- Bottom sheet -->
+      <section id="bottomSheet" class="sheet">
+        <div class="sheet__handle" id="sheetHandle" aria-label="Drag handle"></div>
+
+        <div class="sheet__docked">
+          <div class="address-row">
+            <input id="addressInput" class="address-input" placeholder="Enter your location…" />
+            <button id="goBtn" class="go-btn">Go</button>
+          </div>
+          <div class="eta-row">
+            <span>Bus ETA:</span> <strong id="etaValue">—</strong>
+          </div>
+        </div>
+
+        <div class="sheet__expanded">
+          <h4>Past ride scans</h4>
+          <ul id="ridesList" class="rides-list"></ul>
+        </div>
+      </section>
+    </section>
+
+
+    <!-- DRIVER DASH -->
+    <section id="view-driver" class="view" hidden>
+      <div class="grid cols-3-md gap">
+        <section class="card cols-span-2-md">
+          <h2 class="h3">Today’s Pickups</h2>
+          <ul id="driverPickups" class="list"></ul>
+        </section>
+
+        <aside class="card">
+          <h2 class="h3">Employee Profile</h2>
+          <div class="stack gap-sm" id="driverProfile"></div>
+        </aside>
+
+        <section class="card cols-span-3">
+          <div class="flex between center">
+            <h2 class="h3">My Bus — Live</h2>
+            <div class="muted" id="driverBusLabel"></div>
+          </div>
+          <div class="map">
+            <canvas id="canvasDriver" width="800" height="420"></canvas>
+          </div>
+          <div class="muted tiny" id="lastUpdateDriver">Last update: —</div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ADMIN DASH -->
+    <section id="view-admin" class="view" hidden>
+      <div class="grid cols-3-lg gap">
+        <section class="card cols-span-2-lg">
+          <div class="flex between center">
+            <h2 class="h3">All Buses — Live</h2>
+            <div class="muted tiny">Tap a bus in the table to focus.</div>
+          </div>
+          <div class="map">
+            <canvas id="canvasAdmin" width="1000" height="480"></canvas>
+          </div>
+          <div class="muted tiny" id="lastUpdateAdmin">Last update: —</div>
+        </section>
+
+        <aside class="card">
+          <h2 class="h3">Buses</h2>
+          <table class="table">
+            <thead>
+              <tr><th>Bus</th><th>Route</th><th>Status</th></tr>
+            </thead>
+            <tbody id="adminBusTable"></tbody>
+          </table>
+
+          <h3 class="h4" style="margin-top:1rem">Pickups</h3>
+          <ul id="adminPickups" class="list"></ul>
+        </aside>
+      </div>
+    </section>
+
+    <!--ACCOUNT-->
+    <section id="view-account" class="view" hidden>
+      <div class="grid cols-3-md gap">
+        <aside class="card" style="padding: 0 12px; max-height: 100vh; overflow-y: auto;">
+          <!-- Account -->
+          <h2 class="h3" style="margin-top: 15px; margin-bottom: 10px;">Account</h2>
+          <div class="stack gap-sm" id="riderAccount"></div>
+          <button class="btn btn--ghost" id="editAccountBtn"
+            style="margin-top: 16px; margin-bottom: 5px;">
+            Edit account
+          </button>
+
+          <div style="border-top: 1px solid #ddd; margin: 16px 0;"></div>
+
+          <!-- Pass -->
+          <h3 class="h4">reForm Pass</h3>
+          <div id="passPanel" class="card"></div>
+          <button id="addStudentBtn" class="btn btn--ghost" style="border-radius: 3pt; padding: 8px; margin-top: 10px; margin-bottom: 7px; font-size: small; font-weight: 400;">
+            Load Pass
+          </button>
+
+          <div style="border-top: 1px solid #ddd; margin: 16px 0;"></div>
+
+          <!-- Payment -->
+          <h3 class="h4">Payment</h3>
+          <div class="stack gap-sm" id="paymentInfo"></div>
+          <button class="btn btn--ghost" id="editPaymentBtn" type="button"
+            style="border-radius: 3pt; padding: 8px; margin-top: 16px; font-size: small; font-weight: 400;">
+            Edit payment
+          </button>
+        </aside>
+
+        <section class="card cols-span-2-md">
+          <h2 class="h3">Profile & Activity</h2>
+          <p class="muted">Any shared account content for all roles can live here.</p>
+        </section>
+      </div>
+    </section>
+
+    <section id="view-reForm" class="view" hidden>
+      <div class="card">
+        <h2 class="h3">reForm</h2>
+        <p class="muted">Put your form(s) here.</p>
+      </div>
+    </section>
+
+
+    
+  </main>
+
+  <!-- simple modals -->
+  <!-- ADD VALIDATION HERE -->
+  <dialog id="modalAccount">
+    <form method="dialog" class="stack gap">
+      <h3 class="h4">Edit Account</h3>
+      <label>First name
+        <input id="accFirst" type="text" placeholder="First name" />
+      </label>
+      <label>Last name
+        <input id="accLast" type="text" placeholder="Last name" />
+      </label>
+      <label>Phone
+        <input id="accPhone" type="tel" placeholder="e.g. +2348012345678" />
+      </label>
+      <menu class="flex end gap">
+        <button value="cancel" class="btn btn--ghost">Cancel</button>
+        <button id="saveAccount" class="btn" value="default">Save</button>
+      </menu>
+    </form>
+  </dialog>
+
+
+  <dialog id="modalPayment">
+    <form id="paymentForm" class="stack gap">
+      <h3 class="h4">Manage payment methods</h3>
+
+      <label>Card details
+        <!-- Stripe renders here -->
+        <div id="card-element" class="card-field"></div>
+      </label>
+
+
+      <!-- <div><strong>Card:</strong> <span id="payCardDisplay"></span></div>-->
+
+      <label>Billing email
+        <input id="payEmail" type="email" autocomplete="email" />
+      </label>
+
+      <menu class="flex end gap">
+        <button type="button" class="btn btn--ghost" onclick="document.getElementById('modalPayment').close()">Cancel</button>
+        <button id="savePayment" class="btn" type="submit">Save</button>
+      </menu>
+      <div id="payError" class="error"></div>
+    </form>
+  </dialog>
+
+
+
+
+  <dialog id="modalChoosePlan">
+    <!-- IMPORTANT: do NOT set method="dialog" here -->
+      <form id="choosePlanForm" class="stack gap">
+      <h3 class="h4">Choose a plan</h3>
+
+      <!-- dynamic list will be injected here -->
+      <div id="planList" class="plan-list">
+        <!-- Loading state gets injected here -->
+      </div>
+
+      <div id="choosePlanError" class="error"></div>
+
+      <menu class="flex end gap">
+        <button type="button" class="btn btn--ghost"
+                onclick="document.getElementById('modalChoosePlan').close()">Cancel</button>
+        <button class="btn" type="submit">Save</button>
+      </menu>
+    </form>
+
+  </dialog>
+
+
+
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  
+
+</body>
+</html>
+
+

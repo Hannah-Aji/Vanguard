@@ -1,0 +1,33 @@
+
+[functions.create-setup-intent]
+enabled = true
+verify_jwt = true
+import_map = "./functions/create-setup-intent/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/create-setup-intent/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/create-setup-intent/*.html" ]
+
+[functions.save-payment-method]
+enabled = true
+verify_jwt = true
+import_map = "./functions/save-payment-method/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/save-payment-method/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/save-payment-method/*.html" ]
+
+[functions.start-pass]
+enabled = true
+verify_jwt = true
+import_map = "./functions/start-pass/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/start-pass/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/start-pass/*.html" ]

@@ -1,0 +1,757 @@
+
+
+
+/* Light theme overrides */
+:root {
+  --bg: #f9fafb;
+  --panel: #ffffff;
+  --muted: #111827;
+  --text: #111827;
+  --sub: #6b7280;
+  --brand: #7c5cff;
+  --brand2: #2dd4bf;
+  --ring: #3b82f6;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+  --radius: 14px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --auth-pill-bg: #f3f6ff;
+  --auth-indicator-from: #ffffff;
+  --auth-indicator-to: #e7efff;
+  --auth-border: rgba(2,6,23,.08);
+  --auth-muted: #6b7280;
+  --auth-text: #0b1220;
+  --auth-blue: #3b82f6;
+  --auth-ring: rgba(59,130,246,.25);
+}
+
+/* Translucent app bar: light theme */
+:root .appbar{
+  /* keep it sticky; we’re just overriding visuals */
+  background: linear-gradient(
+      180deg,
+      rgba(255,255,255,0.85),
+      rgba(255,255,255,0.55)
+  );
+  border-bottom: 1px solid #e5e7eb;    /* light gray divider */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Safari/iOS */
+  box-shadow: 0 2px 10px rgba(17,24,39,0.06); /* very soft */
+}
+
+/* Ghost buttons look better with lighter strokes in light mode */
+:root .btn--ghost{
+  background: transparent;
+  outline: 1px solid #d1d5db;          /* light gray */
+}
+:root .btn--ghost:hover{
+  background: rgba(0,0,0,0.03);
+}
+
+/* Optional: tweak the map panel background for light theme */
+:root .map{
+  border: 1px solid #e5e7eb;
+  background:
+    linear-gradient(0deg, rgba(124,92,255,0.06), rgba(255,255,255,0.6) 60%),
+    radial-gradient(500px 200px at 20% -10%, rgba(45,212,191,0.08), rgba(255,255,255,0.2) 70%),
+    #ffffff;
+}
+
+/* Optional: table hover & row divider in light mode */
+:root .table tr:hover{ background:#f3f4f6; }
+:root .table th, 
+:root .table td { border-bottom: 1px solid #e5e7eb; }
+
+/* Light theme: readable nav and brand text */
+:root .appbar,
+:root .topnav button,
+:root .brand,
+:root .brand__text,
+:root .btn--ghost {
+  color: #111827; /* near-black text */
+}
+
+/* Keep brand dot glow visible */
+:root .brand__dot {
+  box-shadow: 0 0 8px rgba(124, 92, 255, 0.6);
+}
+
+/* Hover states for nav buttons */
+:root .topnav button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* If any ghost buttons use white text explicitly, reset it */
+:root .btn--ghost {
+  color: #111827;
+  border-color: #d1d5db;
+}
+:root .btn--ghost:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* Light theme: cards and content panels */
+:root .card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Ensure inner cards (like "Our Mission", "What we value" boxes) contrast slightly */
+:root .card .card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+/* Adjust heading and paragraph colors inside those boxes */
+:root h2,
+:root h3,
+:root h4 {
+  color: #111827;
+}
+:root p,
+:root li,
+:root span,
+:root .muted {
+  color: #374151; /* soft gray text */
+}
+
+/* Optional: subtle hover lift for aesthetic */
+:root .card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+}
+
+/* Light theme: ensure "muted" text flips correctly everywhere */
+:root .muted {
+  color: #111827 !important;  /* medium gray, readable on white */
+  font-size: smaller;
+}
+
+/* ...but keep "muted" text inside cards subtle yet visible */
+:root .card .muted {
+  color: #111827;
+  font-size: smaller;
+   /* medium gray that still stands out on white */
+}
+
+/* Light theme: restore vibrant brand gradient and glow */
+:root .brand__dot {
+  background: linear-gradient(180deg, var(--brand), var(--brand2));
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.6); /* neon aqua glow */
+}
+
+:root .brand__text .accent {
+  color: var(--brand2); /* teal/aqua pop */
+  font-weight: 700;
+}
+
+/* Optional: tweak main brand text to stay readable but subtle */
+:root .brand__text {
+  color: #111827;
+}
+
+/* Optional: hover effect for fun */
+:root .brand:hover .brand__dot {
+  box-shadow: 0 0 18px rgba(45, 212, 191, 0.75), 0 0 6px rgba(124, 92, 255, 0.4);
+  transition: box-shadow 0.2s ease;
+}
+
+/* ========== Light Theme: Dialog / Modals ========== */
+
+/* Modal surface */
+:root dialog{
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  padding: 16px;
+}
+
+/* Backdrop glass */
+:root dialog::backdrop{
+  background: rgba(0,0,0,0.35);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+/* Headings and text inside dialogs */
+:root dialog h3{ color:#111827; }
+:root dialog label{ color:#374151; }
+
+/* Inputs inside dialogs (override dark-form defaults) */
+:root dialog input,
+:root dialog select,
+:root dialog textarea{
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: .8rem 1rem;
+}
+
+/* Focus ring for accessibility */
+:root dialog input:focus,
+:root dialog select:focus,
+:root dialog textarea:focus{
+  outline: 2px solid var(--ring);   /* uses your existing ring = #3b82f6 */
+  border-color: transparent;
+}
+
+/* Divider lines inside dialogs */
+:root dialog hr{ border-top: 1px solid #e5e7eb; }
+
+/* Button row */
+:root dialog menu .btn--ghost{
+  color:#111827;
+  outline: 1px solid #d1d5db;               /* matches your light ghost buttons */
+}
+:root dialog menu .btn--ghost:hover{
+  background: rgba(0,0,0,0.04);
+}
+
+/* Gradient primary button stays the same; add a subtle shadow for lift */
+:root dialog menu .btn{
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Optional: compact spacing in the stacked form */
+:root dialog .stack.gap label{ gap:6px; }
+
+/* ========== Light Theme: Login / Field Inputs ========== */
+
+:root .field label {
+  color: #374151; /* dark gray label text */
+}
+
+:root .field input,
+:root .field select,
+:root .field textarea {
+  background: #ffffff;        /* white field background */
+  color: #111827;             /* near-black input text */
+  border: 1px solid #d1d5db;  /* subtle border */
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+}
+
+:root .field input::placeholder {
+  color: #9ca3af; /* soft gray placeholder */
+}
+
+:root .field input:focus {
+  outline: 2px solid var(--ring);   /* same blue ring as elsewhere */
+  outline-offset: 1px;
+  border-color: transparent;
+  background: #ffffff;
+}
+
+
+
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.5 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif;
+}
+
+
+/* Layout */
+.container{max-width:var(--max); margin:0 auto; padding:16px}
+.appbar{
+  position:sticky; top:0; z-index:10;
+  backdrop-filter: blur(10px);
+  background:linear-gradient(180deg, rgba(15,20,32,.8), rgba(15,20,32,.4));
+  border-bottom:1px solid #1c2333;
+}
+.appbar__inner{display:flex; align-items:center; justify-content:space-between; padding:10px 16px}
+.brand{display:flex; align-items:center; gap:.6rem; font-weight:800}
+.brand__dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(180deg,var(--brand),var(--brand2));box-shadow:0 0 18px var(--brand)}
+.brand__text{letter-spacing:.2px}
+.accent{color:var(--brand2)}
+
+
+
+.card{
+  background:var(--panel); border:1px solid #1c2333; border-radius:var(--radius);
+  padding:16px; box-shadow:var(--shadow);
+}
+.h2{font-size:1.6rem;margin:.2rem 0}
+.h3{font-size:1.25rem;margin:.2rem 0}
+.h4{font-size:1.05rem;margin:.2rem 0}
+.muted{color:#111827}
+.tiny{font-size:.85rem}
+hr{border:0;border-top:1px solid #1b2232;margin:12px 0}
+
+.grid{display:grid}
+.gap{gap:14px} .gap-sm{gap:8px}
+.cols-3-md{grid-template-columns:1fr}
+.cols-span-2-md{grid-column:span 1}
+.cols-3-lg{grid-template-columns:1fr}
+.cols-span-2-lg{grid-column:span 1}
+.flex{display:flex;gap:10px} .between{justify-content:space-between} .center{align-items:center} .end{justify-content:flex-end}
+.stack{display:flex;flex-direction:column}
+
+/* Responsive columns */
+@media (min-width: 800px){
+  .cols-3-md{grid-template-columns: 1fr 1fr 1fr}
+  .cols-span-2-md{grid-column: span 2}
+}
+@media (min-width: 1100px){
+  .cols-3-lg{grid-template-columns: 2fr 1fr}
+  .cols-span-2-lg{grid-column: span 1}
+}
+
+/* Forms & buttons */
+.field{display:grid; gap:6px}
+input, select, textarea{
+  width:100%; padding:.8rem 1rem; border-radius:12px; background:#0e1421; color:#e6ebf7; border:1px solid #1f2636;
+}
+input:focus, select:focus, textarea:focus{outline:2px solid var(--ring); border-color:transparent}
+.btn{
+  display:inline-block; 
+  border-radius: 4px;
+  background-color: #eef2ff;        /* soft indigo tint */
+  color: #3730a3;                   /* indigo text */
+  border: 1px solid #c7d2fe;
+  padding: 8px;                 /* ↓ smaller padding */
+  font-size: 0.75rem;               /* ↓ smaller text */
+  line-height: 1;                   /* snug vertical spacing */
+  font-weight: 500;
+  cursor: pointer;
+  font-size: small;
+}
+
+.btn--ghost{
+  background: transparent;
+  border: 0.5px solid #2a3346;
+  border-radius: 3pt;
+  font-size: small;
+  font-weight: 500;
+  line-height: 1;                   /* snug vertical spacing */
+  cursor: pointer;
+ 
+}
+.btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(1px)}
+
+/* Lists & table */
+.list{list-style:none; padding:0; margin:0}
+.list li{padding:.6rem .6rem; border:1px solid #1b2232; border-radius:10px; background:#0f131d; margin-bottom:8px}
+.list .badge{padding:.2rem .4rem; border-radius:999px; font-size:.75rem; background:#0f172a; border:1px solid #1d2636}
+.table{width:100%; border-collapse:collapse; font-size:.95rem}
+.table th,.table td{padding:.55rem .5rem; border-bottom:1px solid #1b2232; vertical-align:top}
+.table tr{cursor:pointer}
+.table tr:hover{background:#0f1726}
+.table td ul{ margin:0; padding-left:1.1rem }
+
+/* Map (canvas box) */
+.map{
+  width:100%;
+  border-radius:14px; overflow:hidden;
+  border:1px solid #1b2232; background:
+    linear-gradient(0deg, rgba(124,92,255,.06), transparent 60%),
+    radial-gradient(500px 200px at 20% -10%, rgba(45,212,191,.08), transparent 70%),
+    #0c1220;
+  display:grid; place-items:center; padding:10px;
+}
+
+/* Dialog */
+dialog{border:0;border-radius:16px;background:#0f1420;color:var(--text);padding:16px;max-width:420px}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+/* Make all modals slightly larger */
+dialog {
+  width: 480px;            /* wider than default */
+  max-width: 90vw;         /* responsive on mobile */
+  min-height: 320px;       /* increase height */
+  padding: 24px;           /* roomier interior */
+}
+
+/* Light theme override (optional if you want it slightly different in light mode) */
+html.light dialog {
+  width: 520px;
+  min-height: 340px;
+}
+
+dialog label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  gap: 6px;                 /* space between label text and input */
+  margin-bottom: 16px;      /* space below each field */
+}
+
+
+menu{margin:0;padding:0}
+
+
+/* Light theme: pickup list items */
+:root .list li {
+  background: #ffffff;          /* white background */
+  border: 1px solid #e5e7eb;    /* light gray border */
+  color: #111827;                  /* near-black text */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Light theme: muted text inside pickup list */
+:root .list .muted {
+  color: #6b7280 !important;    /* medium gray */
+}
+
+/* Light theme: badges for statuses */
+:root .list .badge {
+  background: #f3f4f6;          /* soft gray badge background */
+  border: 1px solid #d1d5db;
+  color: #111827;
+}
+
+@keyframes pulse-green {
+  0%, 100% { text-shadow: 0 0 6px rgba(34,197,94,0.7); }
+  50% { text-shadow: 0 0 12px rgba(34,197,94,0.9); }
+}
+.neon-green {
+  color: #22c55e;
+  animation: pulse-green 1.8s ease-in-out infinite;
+}
+
+.toast{
+  position: fixed; top: 76px; right: 16px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand), var(--brand2));
+  color: #fff; box-shadow: 0 10px 24px rgba(0,0,0,.12);
+  transform: translateY(-10px); opacity: 0; pointer-events: none;
+  transition: transform .2s ease, opacity .2s ease;
+  z-index: 1000;
+}
+.toast.show{ opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+.toast__icon{
+  width: 22px; height: 22px; display: grid; place-items:center;
+  border-radius: 50%; background: rgba(255,255,255,.18);
+  font-weight: 700;
+}
+.toast__msg{ font-weight: 700; letter-spacing:.2px; }
+
+/* Picker list item */
+.pick-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 12px; border:1px solid #e5e7eb; border-radius:12px;
+  background:#fff;
+}
+.pick-row + .pick-row { margin-top:8px; }
+.pick-row.selected { border-color: var(--brand2); box-shadow: 0 0 0 3px rgba(45,212,191,.18); }
+.pick-row .name { font-weight:700; }
+.pick-row .sub { font-size:.9rem; color:#6b7280; }
+
+
+/* Tabs container */
+.auth-tabs{
+  position: relative;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 28px;
+  background: var(--auth-pill-bg);
+  border: 1px solid var(--auth-border);
+  margin-bottom: 1rem;
+}
+
+/* Each tab button */
+.auth-tab{
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--auth-muted);
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 22px;
+  cursor: pointer;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+.auth-tab.is-active{ color: var(--auth-text); }
+.auth-tab:focus-visible{
+  outline: 3px solid var(--auth-blue);
+  outline-offset: 2px;
+}
+
+/* Sliding pill indicator */
+.auth-tab__indicator{
+  position: absolute;
+  inset: 6px auto 6px 6px;
+  width: calc(50% - 6px);
+  border-radius: 22px;
+  background: linear-gradient(180deg, var(--auth-indicator-from), var(--auth-indicator-to));
+  box-shadow: 0 10px 20px rgba(59,130,246,.18), inset 0 0 0 1px rgba(2,6,23,.06);
+  transition: transform .28s cubic-bezier(.2,.8,.2,1);
+  will-change: transform;
+}
+
+/* Move indicator when Register tab is active (Chrome/Edge/Safari support :has) */
+.auth-tabs:has(#tabRegister.is-active) .auth-tab__indicator{
+  transform: translateX(100%);
+}
+
+/* Panels – respect your existing classes; just a few niceties */
+.auth-panel{ transition: opacity .2s ease; }
+.auth-panel[hidden]{ display: none; }
+.auth-panel.is-active{ opacity: 1; }
+
+/* Inputs – optional polish, safe defaults */
+#view-login .field label{ color:#374151; font-size:.92rem; }
+#view-login input{
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: var(--auth-text);
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(2,6,23,.02);
+}
+#view-login input::placeholder{ color:#9aa3b2 }
+#view-login input:focus{
+  border-color: var(--auth-blue);
+  box-shadow: 0 0 0 6px var(--auth-ring), inset 0 0 0 1px rgba(2,6,23,.02);
+}
+
+/* Buttons – harmonize with your theme if needed */
+#view-login .btn{
+  font-weight: 800;
+  border-radius: 12px;
+}
+
+/* Fallback for browsers without :has() support */
+.auth-tabs[data-active="register"] .auth-tab__indicator{
+  transform: translateX(100%);
+}
+
+.badge-btn {
+  background-color: #eef2ff;        /* soft indigo tint */
+  color: #3730a3;                   /* indigo text */
+  border: 1px solid #c7d2fe;
+  padding: 2px 8px;                 /* ↓ smaller padding */
+  font-size: 0.75rem;               /* ↓ smaller text */
+  line-height: 1;                   /* snug vertical spacing */
+  border-radius: 9999px;            /* pill shape */
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.badge-btn:hover {
+  background-color: #c7d2fe;        /* slightly darker hover */
+  color: #1e1b4b;
+  transform: scale(1.05);
+}
+
+/* container */
+.plan-list {
+  display: grid;
+  gap: 10px;
+}
+
+/* card row */
+.plan-option {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .05s ease;
+}
+
+/* hover / focus states */
+.plan-option:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.08);
+  transform: translateY(-1px);
+}
+.plan-option:focus-within {
+  outline: 2px solid #c7d2fe;
+  outline-offset: 2px;
+}
+
+/* left column */
+.plan-left {
+  display: grid;
+  gap: 2px;
+}
+.plan-title {
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.plan-feature {
+  color: #6b7280; /* muted */
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+
+
+.plan-price {
+  font-weight: 600;
+  margin-top: 4px;
+  font-size: small;
+  color: #3730a3;
+}
+
+
+/* subtle badge */
+.plan-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+.plan-right input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4f46e5; /* your indigo color */
+  outline: none;
+  box-shadow: none;
+}
+.plan-right input[type="radio"]:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.plan-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+
+
+/* selected state highlight */
+.plan-option input[type="radio"]:checked ~ * {}
+/* Use :has for modern browsers to style the selected card */
+
+
+@supports(selector(:has(*))) {
+  .plan-option:has(input[type="radio"]:checked) {
+    border-color: #a5b4fc;
+    box-shadow: 0 6px 18px rgba(99,102,241,0.12);
+  }
+}
+
+/* responsive (stack stays, but spacing/click target remain comfy) */
+@media (min-width: 640px) {
+  .plan-option { padding: 16px 18px; }
+}
+
+
+/* Utility */
+.hidden{display:none!important}
+
+:root{
+  --indigo-50:#eef2ff; --indigo-400:#818cf8; --indigo-600:#4f46e5;
+  --gray-200:#e5e7eb; --gray-300:#d1d5db; --gray-500:#6b7280; --bg:#fff;
+}
+
+/* Tabs */
+.tabs{ position:sticky; top:0; display:flex; gap:8px; padding:10px; background:#fff; z-index:50; border-bottom:1px solid var(--gray-200); }
+.tab{ flex:1; padding:8px 10px; border:1px solid var(--gray-200); background:#fff; border-radius:8px; font-weight:600; }
+.tab.active{ border-color:var(--indigo-400); background:var(--indigo-50); color:var(--indigo-600); }
+
+.view{ display:none; }
+.view.active{ display:block; }
+
+/* Map background */
+.map{ position:fixed; inset:0; }
+
+/* Floating next-stop card + QR */
+.next-stop{
+  position:fixed; top:72px; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:10px;
+  background:#fff; border:1px solid var(--gray-200); border-radius:14px;
+  padding:10px 12px; box-shadow:0 4px 14px rgba(0,0,0,.08); z-index:20;
+}
+.next-stop__title{ font-weight:700; }
+.next-stop__eta{ color:var(--gray-500); font-size:0.9rem; }
+
+.icon-btn{
+  display:grid; place-items:center; width:36px; height:36px; border-radius:10px;
+  border:1px solid var(--gray-200); background:#fff;
+}
+
+/* Expanded stops panel (toggles) */
+.stops-panel{
+  position:fixed; top:120px; left:50%; transform:translateX(-50%);
+  width:min(92vw, 520px); max-height:40vh; overflow:auto;
+  background:#fff; border:1px solid var(--gray-200); border-radius:14px; padding:10px; z-index:19;
+  box-shadow:0 10px 24px rgba(0,0,0,.10);
+}
+.stops-panel__header{ font-weight:700; margin-bottom:6px; }
+.stops-list{ list-style:none; margin:0; padding:0; }
+.stops-list li{ display:flex; justify-content:space-between; border-bottom:1px dashed var(--gray-300); padding:8px 2px; }
+.stops-list li:last-child{ border-bottom:none; }
+.stops-list .tag{ font-size:.8rem; color:#111; background:var(--indigo-50); border:1px solid var(--indigo-400); padding:2px 6px; border-radius:9999px; }
+
+/* QR button */
+.qr-btn{
+  position:fixed; top:72px; left:50%; transform:translateX(calc(-50% + 150px));
+  width:42px; height:42px; border-radius:12px; border:1px solid var(--gray-200); background:#fff; z-index:20;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+}
+
+/* Bottom sheet */
+.sheet{
+  position:fixed; left:0; right:0; bottom:0; height:60vh; /* full height area */
+  display:grid; grid-template-rows:auto 1fr; background:transparent; z-index:30;
+  pointer-events:none; /* children re-enable */
+}
+.sheet__handle{
+  margin:0 auto; width:46px; height:6px; border-radius:9999px; background:var(--gray-300);
+  position:relative; top:-8px; pointer-events:auto;
+}
+.sheet__docked, .sheet__expanded{
+  pointer-events:auto;
+  background:#fff; border-top-left-radius:16px; border-top-right-radius:16px;
+  border-top:1px solid var(--gray-200);
+}
+/* Docked height ~20% viewport */
+.sheet__docked{
+  position:absolute; left:0; right:0; bottom:0; height:20vh; padding:10px 12px; box-shadow:0 -6px 14px rgba(0,0,0,.08);
+}
+/* Expanded half-screen overlay */
+.sheet--expanded .sheet__docked{ height:50vh; }
+.sheet__expanded{
+  position:absolute; left:0; right:0; bottom:20vh; height:0; overflow:hidden; transition:height .2s;
+  padding:0 12px;
+}
+.sheet--expanded .sheet__expanded{ height:30vh; padding:10px 12px; }
+
+/* Address row */
+.address-row{ display:flex; gap:8px; }
+.address-input{ flex:1; padding:10px 12px; border:1px solid var(--gray-300); border-radius:10px; }
+.go-btn{
+  padding:10px 14px; border:1px solid #c7d2fe; border-radius:10px; background:var(--indigo-50); color:#3730a3; font-weight:600;
+}
+.eta-row{ margin-top:8px; color:var(--gray-500); }
+
+/* Rides list */
+.rides-list{ list-style:none; margin:8px 0 0; padding:0; }
+.rides-list li{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--gray-200); }
+.rides-list li:last-child{ border-bottom:none; }
+
+/* Map resilience under overlays */
+#routeMap{ z-index:0; }
+
