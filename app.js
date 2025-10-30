@@ -1,4 +1,3 @@
-
 // ==========================
 // Supabase init
 // ==========================
@@ -270,10 +269,32 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
       return;
     }
     
-    const applied = await applySession(signIn.session);
-    if (!applied) {
-      showToast?.('Signed in, but we could not load your dashboard. Please try again.');
-      return;
+    // Pre-patch behavior: hydrate and route will happen in boot (below) or via goDashboard.
+    // We'll call apply-like logic here lightly:
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role, first_name, last_name, phone')
+      .eq('id', signIn.user.id)
+      .maybeSingle();
+
+    const first = profile?.first_name?.trim?.() || '';
+    const last  = profile?.last_name?.trim?.() || '';
+    const displayName = [first, last].filter(Boolean).join(' ') || signIn.user.email;
+
+    state.user = {
+      id: signIn.user.id,
+      role: profile?.role || 'rider',
+      email: signIn.user.email,
+      name: displayName,
+      phone: profile?.phone || ''
+    };
+
+    if (els.logoutBtn) els.logoutBtn.hidden = false;
+
+    if (typeof goDashboard === 'function') {
+      goDashboard();
+    } else {
+      await routeTo(state.user.role);
     }
 
     const firstName = (state.user?.name || state.user?.email || email || '').split(' ')[0] || email;
@@ -286,13 +307,20 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
 
 
 
-
 els.logoutBtn?.addEventListener('click', async ()=>{
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error('logout failed:', error);
+    showToast?.(error.message || 'Unable to log out. Please try again.');
+    return;
+  }
+
+  // Revert to login view
   state.user = null;
   if (els.logoutBtn) els.logoutBtn.hidden = true;
   stopLoops();
   showOnly(els.login);
+  showToast?.('You have been logged out.');
 });
 
 // ---- Register (rider-only) ----
@@ -670,7 +698,8 @@ async function startRiderLoop(){
     if (b) drawBus(ctx, { x: scaleX(b.y), y: scaleY(b.x), id: busId }, true);
     els.lastUpdateRider.innerHTML = `<div class="muted">Last update: ${new Date().toLocaleTimeString()}</div>`;
 
-    driverLoop = requestAnimationFrame(draw);
+    // FIX: rider loop variable
+    riderLoop = requestAnimationFrame(draw);
   }
   draw();
 
@@ -1001,10 +1030,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPassPanel();
 });
 
-
-
-supabase.auth.onAuthStateChange(async (_event, session) => {
-  await applySession(session);
+// REVERTED: Do not route on auth changes, only refresh the pass panel
+supabase.auth.onAuthStateChange((_event, _session) => {
   renderPassPanel();
 });
 
@@ -1058,6 +1085,7 @@ async function loadAndRenderPlans() {
     // 2) fetch user's current plan to preselect
     let currentCode = null;
     const { data: { user } } = await supabase.auth.getUser();
+
     if (user) {
       const { data: passRow } = await supabase
         .from('riders')
@@ -1142,58 +1170,66 @@ async function savePaymentToRiders() {
 
 
 
+  // ==========================
+  // Session restore on load (reverted boot)
+  // ==========================
+  // Minimal applySession — restores the function your login submit expects
+  async function applySession(session) {
+    try {
+      const user = session?.user;
+      if (!user) {
+        state.user = null;
+        if (els.logoutBtn) els.logoutBtn.hidden = true;
+        stopLoops();
+        showOnly(els.login);
+        return false;
+      }
 
-// ==========================
-// Session restore on load
-// ==========================
+      // Try profile; don't block routing if it fails
+      let profile = null;
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('role, first_name, last_name, phone')
+          .eq('id', user.id)
+          .maybeSingle();
 
-async function applySession(session) {
-  try {
-    const user = session?.user;
-    if (!user) {
-      state.user = null;
-      els.logoutBtn.hidden = true;
-      stopLoops();
+        if (!error) profile = data || null;
+        else console.warn('[applySession] profile read failed (routing anyway):', error);
+      } catch (e) {
+        console.warn('[applySession] profile read threw (routing anyway):', e);
+      }
+
+      const first = profile?.first_name?.trim?.() || '';
+      const last  = profile?.last_name?.trim?.()  || '';
+      const displayName = [first, last].filter(Boolean).join(' ') || user.email;
+
+      state.user = {
+        id: user.id,
+        role: profile?.role || 'rider',
+        email: user.email,
+        name: displayName,
+        phone: profile?.phone || ''
+      };
+
+      if (els.logoutBtn) els.logoutBtn.hidden = false;
+      await routeTo(state.user.role);
+      return true;
+    } catch (err) {
+      console.error('[applySession] fatal', err);
       showOnly(els.login);
-      return;
+      return false;
     }
-
-    const { data: profile, error } = await supabase
-      .from('user_profiles')
-      .select('role, first_name, last_name, phone')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Failed to load profile on session apply', error);
-      showOnly(els.login);
-      return;
-    }
-
-    const first = profile?.first_name?.trim?.() || '';
-    const last = profile?.last_name?.trim?.() || '';
-    const displayName = [first, last].filter(Boolean).join(' ') || user.email;
-
-    state.user = {
-      id: user.id,
-      role: profile?.role || 'rider',
-      email: user.email,
-      name: displayName,
-      phone: profile?.phone || ''
-    };
-
-    if (els.logoutBtn) els.logoutBtn.hidden = false;
-    await routeTo(state.user.role);
-  } catch (err) {
-    console.error('applySession fatal', err);
-    showOnly(els.login);
   }
-}
 
-(async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  await applySession(session);
-})();
+
+  // Boot: restore session and route
+  (async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    await applySession(session);
+  })();
+
+
 
 // --- Leaflet map (background) ---
 let map, busMarker, userMarker, routePolyline;
