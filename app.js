@@ -265,37 +265,19 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     // 1) Auth
     const { data: signIn, error: sErr } = await supabase.auth.signInWithPassword({ email, password });
     if (sErr) { showToast?.(sErr.message || 'Sign-in failed'); return; }
+    if (!signIn?.session) {
+      showToast?.('Check your email to finish signing in.');
+      return;
+    }
+    
+    const applied = await applySession(signIn.session);
+    if (!applied) {
+      showToast?.('Signed in, but we could not load your dashboard. Please try again.');
+      return;
+    }
 
-    const userId = signIn.user.id;
-
-    // 2) Profile (role now, not role)
-    const { data: profile, error: pErr } = await supabase
-      .from('user_profiles')
-      .select('role, first_name, last_name, phone')
-      .eq('id', userId)
-      .maybeSingle();
-
-    if (pErr) { console.error(pErr); showToast?.('Could not load profile'); return; }
-    if (!profile) { showToast?.('Profile not found'); return; }
-
-    const displayName = [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || email;
-
-    // 3) Save minimal state
-    state.user = {
-      id: userId,
-      role: profile.role || 'rider',   // enum values: 'rider' | 'driver' | 'admin'
-      email,
-      name: displayName,
-      phone: profile.phone || ''
-    };
-
-    // 4) UI bits + route
-    if (els.logoutBtn) els.logoutBtn.hidden = false;
-
-    // go to correct home for role
-    await routeTo(state.user.role);
-
-    showToast?.(`Welcome ${displayName.split(' ')[0]}!`);
+    const firstName = (state.user?.name || state.user?.email || email || '').split(' ')[0] || email;
+    showToast?.(`Welcome ${firstName}!`);
   } catch (ex) {
     console.error('login fatal:', ex);
     showToast?.(ex?.message || 'Unexpected error during sign-in');
@@ -305,10 +287,10 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
 
 
 
-els.logoutBtn.addEventListener('click', async ()=>{
+els.logoutBtn?.addEventListener('click', async ()=>{
   await supabase.auth.signOut();
   state.user = null;
-  els.logoutBtn.hidden = true;
+  if (els.logoutBtn) els.logoutBtn.hidden = true;
   stopLoops();
   showOnly(els.login);
 });
@@ -1019,7 +1001,10 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPassPanel();
 });
 
-supabase.auth.onAuthStateChange((_event, _session) => {
+
+
+supabase.auth.onAuthStateChange(async (_event, session) => {
+  await applySession(session);
   renderPassPanel();
 });
 
@@ -1162,22 +1147,53 @@ async function savePaymentToRiders() {
 // Session restore on load
 // ==========================
 
-(async ()=>{
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) {
-    const { data: profile } = await supabase
+async function applySession(session) {
+  try {
+    const user = session?.user;
+    if (!user) {
+      state.user = null;
+      els.logoutBtn.hidden = true;
+      stopLoops();
+      showOnly(els.login);
+      return;
+    }
+
+    const { data: profile, error } = await supabase
       .from('user_profiles')
       .select('role, first_name, last_name, phone')
       .eq('id', user.id)
       .maybeSingle();
-    if (profile) {
-      state.user = { id: user.id, role: profile.role, email: user.email, name: profile.first_name || user.email, phone: profile.phone || '' };
-      els.logoutBtn.hidden = false;
-      goDashboard();
-    }
-  }
-})();
 
+    if (error) {
+      console.error('Failed to load profile on session apply', error);
+      showOnly(els.login);
+      return;
+    }
+
+    const first = profile?.first_name?.trim?.() || '';
+    const last = profile?.last_name?.trim?.() || '';
+    const displayName = [first, last].filter(Boolean).join(' ') || user.email;
+
+    state.user = {
+      id: user.id,
+      role: profile?.role || 'rider',
+      email: user.email,
+      name: displayName,
+      phone: profile?.phone || ''
+    };
+
+    if (els.logoutBtn) els.logoutBtn.hidden = false;
+    await routeTo(state.user.role);
+  } catch (err) {
+    console.error('applySession fatal', err);
+    showOnly(els.login);
+  }
+}
+
+(async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  await applySession(session);
+})();
 
 // --- Leaflet map (background) ---
 let map, busMarker, userMarker, routePolyline;

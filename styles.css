@@ -671,8 +671,10 @@ menu{margin:0;padding:0}
 .tab{ flex:1; padding:8px 10px; border:1px solid var(--gray-200); background:#fff; border-radius:8px; font-weight:600; }
 .tab.active{ border-color:var(--indigo-400); background:var(--indigo-50); color:var(--indigo-600); }
 
-.view{ display:none; }
-.view.active{ display:block; }
+
+
+.view { display: block; }
+.view[hidden] { display: none !important; }
 
 /* Map background */
 .map{ position:fixed; inset:0; }
